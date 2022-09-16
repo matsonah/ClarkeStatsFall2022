@@ -1,0 +1,14 @@
+Terminal
+git config user.email "type your email here between quotes"
+git config user.name "type your name here between quotes"
+
+Tools -> Version Control -> Commit 
+Click the box next to any file you want to upload. (Stage)
+Type in a message under "Commit Message" 
+Click Commit 
+
+Terminal 
+git push 
+
+type your github username
+paste your github personal access token instead of your password. 
