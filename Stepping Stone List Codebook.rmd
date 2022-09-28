@@ -1,0 +1,76 @@
+---
+title: "Stepping Stone List Guide"
+author: "Kingston and Matson"
+date: "2022-09-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Format
+
+## Number
+
+Number of the stepping stone
+
+## Outcomes
+
+Each outcome is flagged with either an asterisk (\*) or the abbreviation of the outcome or is left empty. If the abbreviation of the outcome is present, then the associated stepping stone can be allocated to that outcome with no further argument. If an asterisk (\*) is present, then an argument must be made to justify allocating that stepping stone to that outcome.
+
+### CG
+
+Common good. Students will relate statistical ideas to the common good
+
+### PB
+
+Professional Behavior. Students will demonstrate professional behavior
+
+### LT
+
+Language and Terminology. Students will use the language and terminology of statistics correctly, in speaking and writing.
+
+### CT
+
+Critical Thinking. Students will demonstrate critical thinking in a statistical context.
+
+### TE
+
+Technology. Students will utilize software to organize, present, interpret, and test data.
+
+### FI
+
+Fundamental Ideas of Sampling. Students will demonstrate understanding of the fundamental ideas of sampling from large populations.
+
+### OE
+
+Observation and Experimentation. Students will explain the difference between observational and experimental studies, and the connection to causality
+
+### NG
+
+Numbers and Graphs. Students will explore data numerically and graphically using appropriate tools
+
+### PN
+
+Probability and Normal Distributions. Students will interpret probability models for normal distributions.
+
+### CI
+
+Confidence Intervals. Students will construct and interpret confidence intervals.
+
+### ST
+
+Significance Testing. Students will interpret results of significance tests for one- and two-sample hypotheses.
+
+### DW
+
+Data Wrangling. Students will gather and manipulate data sets and delve into them to glean information about a population.
+
+## Description of Stone
+
+This column contains the description of what someone will be able to do in order to claim the stepping stone.
+
+# Purpose
+
+Providing this data set to students can help them make plans for the rest of their semester. Hopefully, students will use the CSV to allocate their stones wisely.
