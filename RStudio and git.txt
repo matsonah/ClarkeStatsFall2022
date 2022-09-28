@@ -3,6 +3,9 @@ The following process works once the initial git connection is established. You 
 Terminal
 git config user.email "type your email here between quotes"
 git config user.name "type your name here between quotes"
+git config remote.origin.url "https://github.com/matsonah/ClarkeStatsFall2022.git" 
+git config branch.main.remote "origin"
+git config branch.main.merge "refs/heads/main" 
 
 git config --local --list
 
