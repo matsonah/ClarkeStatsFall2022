@@ -1,6 +1,11 @@
+The following process works once the initial git connection is established. You will see a "git" tab on the top right window.
+
 Terminal
 git config user.email "type your email here between quotes"
 git config user.name "type your name here between quotes"
+
+git config --local --list
+
 
 Tools -> Version Control -> Commit 
 Click the box next to any file you want to upload. (Stage)
