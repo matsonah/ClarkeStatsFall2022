@@ -1,4 +1,5 @@
-The following process works once the initial git connection is established. You will see a "git" tab on the top right window.
+Tools -> Version Control -> Project Setup -> Git/SVN -> Version control system: Git 
+This triggers a restart of the RStudio session. 
 
 Terminal
 git config user.email "type your email here between quotes"
