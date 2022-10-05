@@ -1,0 +1,494 @@
+---
+title: "Introduction to Normal Distributions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries
+
+Requires the tidyverse library from the tidyverse package.
+
+```{r}
+
+library(tidyverse)
+
+```
+
+## Initialize Data
+
+```{r}
+
+dice_rolls = c(10,5, 7, 4, 8, 8, 7, 11, 6, 6 )  # actually roll two dice and add them at least ten times. Enter your data here.
+j=0 # We'll use this later. 
+play=0 # We'll use this later. 
+
+
+```
+
+### Structure the data
+
+```{r}
+dice_gathered <- 
+  dice_rolls %>% 
+    data.frame(`Sums of Dice`=.)
+
+
+str(dice_gathered)
+
+```
+
+### Initial Plot
+
+```{r}
+
+dice_gathered %>% 
+  ggplot(
+    aes(Sums.of.Dice)
+    ) + 
+    geom_histogram(
+      col="white",
+      binwidth=1
+      )
+```
+
+### Automate
+
+```{r}
+
+#initialize dice_sums 
+dice_sums <- 0 
+num_rolls = 3000    # pick a big number and replace 100 with your number. 
+
+for(i in 1:num_rolls) {
+  dice_sums[i] = sample(1:6,1)+sample(1:6,1)
+}
+
+dice_data <- 
+  dice_sums %>% 
+    data.frame(x=.)
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      col="white",
+      binwidth=1
+      )
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      )
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      ) +
+   stat_function(      #draws bell curve
+    fun=dnorm, 
+    args=list(
+        mean=mean(dice_data$x), 
+       sd=sd(dice_data$x)
+        ), 
+    col = "green", 
+    size = 2
+    ) +
+  geom_density(
+      col="blue"
+    )
+
+
+```
+
+## Mean and Standard Deviations
+
+### purple lines, shading and purple, shading no purple
+
+```{r}
+
+# requires running the code block that initializes and generates dice_data.
+sum_mean <- 
+  dice_data$x %>% 
+    mean()
+
+sum_sd <-
+  dice_data$x %>% 
+    sd()
+
+sum_min <- 
+    dice_data$x %>% 
+    min()
+
+sum_max <- 
+  dice_data$x %>% 
+    max()
+
+
+sum_left=0
+sum_left[1]=sum_mean - 3*sum_sd #loads sum_left with the leftmost spot.
+
+for(i in 1:6){
+  sum_left[i+1]=sum_left[i]+sum_sd   #computes the next spot by going right one standard deviation and saves it in sum_left.
+}
+
+#sum_left[4] = NA   # optional code to remove the middle line (where the mean is). R will grumble a little as it counts from 1 to 7 and has to skip 4. 
+
+
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      ) +
+   stat_function(      #draws bell curve
+    fun=dnorm, 
+    args=list(
+        mean=mean(dice_data$x), 
+       sd=sd(dice_data$x)
+        ), 
+    col = "green", 
+    size = 2
+    ) + 
+    geom_vline(
+     xintercept = sum_left,    #plots all veritcal lines at once. 
+     col="violet", 
+     linetype="longdash",
+     size=2)
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      ) +
+   stat_function(      #draws bell curve
+    fun=dnorm, 
+    args=list(
+        mean=mean(dice_data$x), 
+       sd=sd(dice_data$x)
+        ), 
+    col = "green", 
+    size = 2
+    ) + 
+    geom_vline(
+     xintercept = sum_left,    #plots all veritcal lines at once. 
+     col="violet", 
+     linetype="longdash",
+     size=2) + 
+  stat_function(      #shades in innermost region
+    fun=dnorm_sd, 
+    args=list(numsd = 1), 
+    geom="area",
+    fill="red", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in next region
+    fun=dnorm_sd, 
+    args=list(numsd = 2), 
+    geom="area",
+    fill="orange", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in final region
+    fun=dnorm_sd, 
+    args=list(numsd = 3), 
+    geom="area",
+    fill="yellow", 
+    alpha=0.3
+  ) 
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      ) +
+   stat_function(      #draws bell curve
+    fun=dnorm, 
+    args=list(
+        mean=mean(dice_data$x), 
+       sd=sd(dice_data$x)
+        ), 
+    col = "green", 
+    size = 2
+    ) + 
+  stat_function(      #shades in innermost region
+    fun=dnorm_sd, 
+    args=list(numsd = 1), 
+    geom="area",
+    fill="red", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in next region
+    fun=dnorm_sd, 
+    args=list(numsd = 2), 
+    geom="area",
+    fill="orange", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in final region
+    fun=dnorm_sd, 
+    args=list(numsd = 3), 
+    geom="area",
+    fill="yellow", 
+    alpha=0.3
+  )
+```
+
+### shading, no purple.
+
+```{r}
+#initialize dice_sums 
+dice_sums <- 0 
+num_rolls = 100    # pick a big number and replace 100 with your number. 
+
+for(i in 1:num_rolls) {
+  dice_sums[i] = sample(1:6,1)+sample(1:6,1)
+}
+
+dice_data <- 
+  dice_sums %>% 
+    data.frame(x=.)
+
+# Make sure these two have been initialized for your data set. 
+sum_mean <- 
+  dice_data$x %>% 
+    mean()
+sum_sd <- 
+  dice_data$x %>% 
+    sd() 
+
+play[j]=sum_mean  #ignore these two lines the first time you see them. 
+j=j+1 
+
+# Fancy function defined to allow for shading. 
+dnorm_sd <- function(x,numsd){
+  norm_sd <- dnorm(x,sum_mean, sum_sd)
+  lb = sum_mean - numsd*sum_sd  #left bound 
+  rb = sum_mean + numsd*sum_sd  #right bound 
+  # Force NA values outside interval x in [leftbound, rightbound]:
+  norm_sd[x <= lb | x >= rb] <- NA
+  return(norm_sd)   #return is the result of the function dnorm_sd 
+}
+
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      ) +
+   stat_function(      #draws bell curve
+    fun=dnorm, 
+    args=list(
+        mean=mean(dice_data$x), 
+       sd=sd(dice_data$x)
+        ), 
+    col = "green", 
+    size = 2
+    ) + 
+  stat_function(      #shades in innermost region
+    fun=dnorm_sd, 
+    args=list(numsd = 1), 
+    geom="area",
+    fill="red", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in next region
+    fun=dnorm_sd, 
+    args=list(numsd = 2), 
+    geom="area",
+    fill="orange", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in final region
+    fun=dnorm_sd, 
+    args=list(numsd = 3), 
+    geom="area",
+    fill="yellow", 
+    alpha=0.3
+  )
+```
+
+## z-scores
+
+Once you've run this code block, you can re-run it to move the blue line around.
+
+```{r}
+
+#initialize dice_sums 
+dice_sums <- 0 
+num_rolls = 100    # pick a big number and replace 100 with your number. 
+
+for(i in 1:num_rolls) {
+  dice_sums[i] = sample(1:6,1)+sample(1:6,1)
+}
+
+dice_data <- 
+  dice_sums %>% 
+    data.frame(x=.)
+
+# Make sure these two have been initialized for your data set. 
+sum_mean <- 
+  dice_data$x %>% 
+    mean()
+sum_sd <- 
+  dice_data$x %>% 
+    sd() 
+
+play[j]=sum_mean  #ignore these two lines the first time you see them. 
+j=j+1 
+
+obs = c(sum_mean,dice_data$x[sample(1:100,1)])   #picks an observation at random.
+obs_cols = c("violet","blue")
+
+#calculates z-score
+z_score = (obs[2]-obs[1])/sum_sd      #obs[2] pulls the observation's information and obs[1] pulls the mean of the sample. 
+area=integrate(dnorm,0,z_score)
+cat("Obs value: ", obs[2],"\nmean: ", obs[1], "\nz-score: ", z_score, "\nPercent of observances between observation and mean: ", 100*abs(area$value),"%")
+
+
+
+# Fancy function defined to allow for shading. 
+dnorm_sd <- function(x,numsd){
+  norm_sd <- dnorm(x,sum_mean, sum_sd)
+  lb = sum_mean - numsd*sum_sd  #left bound 
+  rb = sum_mean + numsd*sum_sd  #right bound 
+  # Force NA values outside interval x in [leftbound, rightbound]:
+  norm_sd[x <= lb | x >= rb] <- NA
+  return(norm_sd)   #return is the result of the function dnorm_sd 
+}
+
+
+dice_data %>% 
+  ggplot(
+    aes(x)
+    ) + 
+    geom_histogram(
+      aes(y=..density..),
+      col="white",
+      binwidth=1
+      ) +
+   stat_function(      #draws bell curve
+    fun=dnorm, 
+    args=list(
+        mean=mean(dice_data$x), 
+       sd=sd(dice_data$x)
+        ), 
+    col = "green", 
+    size = 2
+    ) + 
+  stat_function(      #shades in innermost region
+    fun=dnorm_sd, 
+    args=list(numsd = 1), 
+    geom="area",
+    fill="red", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in next region
+    fun=dnorm_sd, 
+    args=list(numsd = 2), 
+    geom="area",
+    fill="orange", 
+    alpha=0.3
+  ) +
+  stat_function(      #shades in final region
+    fun=dnorm_sd, 
+    args=list(numsd = 3), 
+    geom="area",
+    fill="yellow", 
+    alpha=0.3
+  ) +
+  geom_vline(
+    xintercept=obs, 
+    linetype="longdash", 
+    col=obs_cols,
+    size=2
+  )
+
+```
+
+### Gather Play Data
+
+```{r}
+
+sample_data <- 
+  play %>% 
+    data.frame("average.sample.sum"=.)
+
+samples_mean <- 
+  sample_data$average.sample.sum %>% 
+    mean()
+
+samples_sd <-
+  sample_data$average.sample.sum %>% 
+    sd()
+
+samples_min <- 
+    sample_data$average.sample.sum %>% 
+    min()
+
+samples_max <- 
+  sample_data$average.sample.sum %>% 
+    max()
+
+samples_buckets=(samples_max-samples_min)/10 # to make 10+1=11 buckets in a histogram.
+
+sample_data %>% 
+  ggplot( aes(average.sample.sum)
+  ) + 
+  geom_histogram(
+    col="white",
+    binwidth=samples_buckets
+    )  
+
+```
+
+### Automate moving blue line
+
+Captures the results as if we clicked play a bunch of times. After gathering these results go back to the previous code block and run it.
+
+```{r}
+
+#fast forward. 
+dice_sums <- 0 
+num_rolls = 100 
+clicks=1500
+
+#j=1    # if starting from scratch uncomment this line to initialize j. 
+
+for(k in j:clicks){
+    for(i in 1:num_rolls) {
+      dice_sums[i] = sample(1:6,1)+sample(1:6,1)
+    }
+    play[k]=mean(dice_sums)
+  }
+
+```
