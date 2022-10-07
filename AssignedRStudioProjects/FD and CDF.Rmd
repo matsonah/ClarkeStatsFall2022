@@ -1,0 +1,99 @@
+---
+title: "Frequency Distributions and Cummulative Frequency Distributions"
+output: html_document
+date: "2022-09-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Load Libraries
+
+```{r}
+library(tidyverse)
+
+```
+
+
+# Load Data
+
+```{r}
+
+filename <- 
+  c("Water System Summary_20221007.csv")
+
+mydata <- 
+  read_csv(filename, show_col_types = F)
+
+mydata %>%
+  names()
+
+```
+
+# Select Data 
+
+```{r}
+
+mydata$x <- 
+  mydata$`Number of Violations`
+
+mydata <- 
+  mydata %>% 
+    drop_na(x)
+```
+
+
+# Plot Data 
+
+```{r}
+
+mydata=insidedata
+
+mydata %>% 
+  ggplot(
+    aes(x)
+  ) + 
+  geom_density(fill="blue")
+
+mydata %>% 
+  ggplot(
+    aes(x)
+  ) +
+  stat_ecdf()
+
+mydata %>% 
+  ggplot(
+    aes(x)
+  ) + 
+  geom_density(fill="blue") + 
+  stat_ecdf()
+
+```
+
+# Without the outliers
+
+
+```{r}
+
+initdata = mydata
+
+insidedata <- 
+  mydata %>% 
+    mutate(zx = scale(x)) %>% 
+    filter(between(zx, -2.5, 2.5)
+         )
+
+lowdata <- 
+  mydata %>% 
+    mutate(zx = scale(x)) %>% 
+    filter(between(zx, -Inf, -2.5))
+
+highdata <- 
+  mydata %>% 
+    mutate(zx = scale(x)) %>% 
+    filter(between(zx, 2.5, Inf))
+
+```
+
