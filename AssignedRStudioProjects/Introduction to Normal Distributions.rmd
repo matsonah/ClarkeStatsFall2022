@@ -89,6 +89,17 @@ dice_data %>%
       binwidth=1
       )
 
+# Fancy function defined to allow for shading. 
+dnorm_sd <- function(x,numsd){
+  norm_sd <- dnorm(x,sum_mean, sum_sd)
+  lb = sum_mean - numsd*sum_sd  #left bound 
+  rb = sum_mean + numsd*sum_sd  #right bound 
+  # Force NA values outside interval x in [leftbound, rightbound]:
+  norm_sd[x <= lb | x >= rb] <- NA
+  return(norm_sd)   #return is the result of the function dnorm_sd 
+}
+
+
 dice_data %>% 
   ggplot(
     aes(x)
@@ -284,17 +295,6 @@ sum_sd <-
 
 play[j]=sum_mean  #ignore these two lines the first time you see them. 
 j=j+1 
-
-# Fancy function defined to allow for shading. 
-dnorm_sd <- function(x,numsd){
-  norm_sd <- dnorm(x,sum_mean, sum_sd)
-  lb = sum_mean - numsd*sum_sd  #left bound 
-  rb = sum_mean + numsd*sum_sd  #right bound 
-  # Force NA values outside interval x in [leftbound, rightbound]:
-  norm_sd[x <= lb | x >= rb] <- NA
-  return(norm_sd)   #return is the result of the function dnorm_sd 
-}
-
 
 dice_data %>% 
   ggplot(
