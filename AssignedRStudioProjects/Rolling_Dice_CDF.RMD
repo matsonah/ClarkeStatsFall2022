@@ -153,6 +153,50 @@ rolls %>%
 sums %>% 
   freq() 
 
+```
 
+## z-scores 
 
+### Find z
+
+```{r}
+
+mu <- 
+  sums %>%
+    mean()
+
+sigma <- 
+  sums %>% 
+    sd() 
+
+obs <- sum1 
+
+z <- 
+  (obs - mu)/sigma 
+
+z
+
+cat(sep="", "\n", obs, " is ", z, " standard deviation(s) away from ", mu, ".\n")
+```
+
+### Find obs.
+
+```{r}
+
+mu <- 
+  sums %>%
+    mean()
+
+sigma <- 
+  sums %>% 
+    sd()
+
+z = 2
+
+obs <- 
+  mu + z * sigma 
+
+obs
+
+cat(sep="", "\n", obs, " is ", z, " standard deviation(s) away from ", mu, ".\n")
 ```
