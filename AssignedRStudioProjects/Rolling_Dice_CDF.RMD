@@ -1,0 +1,158 @@
+---
+title: "Dice and CDF"
+output: html_document
+date: "2022-10-12"
+---
+
+Are you in visual mode? (If not, switch modes.)
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Packages and Libraries
+
+```{r}
+
+install.packages('tidyverse')
+install.packages('clean')
+
+```
+
+```{r}
+
+library(tidyverse)
+library(clean)
+
+```
+
+# Generate Data
+
+## Simulate rolling dice.
+
+Change numrolls to however many rolls you want to simulate.
+
+```{r}
+
+numrolls <- 
+  10
+
+sums <- 
+  0 
+
+for(i in 1:numrolls) {
+  sums[i] = sample(1:6,1) + sample(1:6, 1)  
+}
+
+sums <- 
+  sums %>% 
+    sort() 
+
+```
+
+## Force Structure
+
+```{r}
+
+sums.cdf <- 
+  sums %>% 
+    ecdf() 
+
+rolls <- 
+  data.frame( 
+    sums, 
+    rank = sums.cdf(sums))
+
+```
+
+## Graph Histogram and Cumulative Density
+
+```{r}
+
+rolls %>% 
+  ggplot( aes(x =sums)) + 
+    geom_histogram( aes(y=..density..), binwidth=0.5) + 
+    stat_ecdf() 
+
+```
+
+# Comparing Data
+
+## Make a choice
+
+Choose values for sum1 and sum2 OR roll dice and add to generate sum1 and sum2 randomly.
+
+### Pick whimsically
+
+sum1 = your choice
+
+### Determine randomly
+
+sum1 = (roll two dice and add)
+
+### Set it to the mean
+
+sum1 = mean(rolls\$sums)
+
+## Code your choice
+
+```{r}
+
+sum1 = 6
+  
+sum2 = mean(rolls$sums)
+
+portion <- 
+  abs(sums.cdf(sum1) - sums.cdf(sum2) )
+
+portion 
+
+cat(sep="", "\n",portion*100, "% of the data, or ", portion*length(rolls$sums)," observations, live between ", sum1, " and ", sum2, ".\n")
+
+```
+
+### Graph Focus Area
+
+```{r}
+
+left <- 
+  min(sum1, sum2)
+
+right <-
+  max(sum1, sum2)
+
+focus_data <- 
+  rolls %>% 
+    filter(
+      between(sums, left, right)
+      ) 
+
+rolls %>% 
+  ggplot( aes(x=sums)) + 
+    stat_ecdf() + 
+    geom_vline(xintercept = sum1, col="blue") + 
+    geom_vline(xintercept = sum2, col="green") + 
+    geom_hline(yintercept = sums.cdf(sum1), col="blue") + 
+    geom_hline(yintercept = sums.cdf(sum2), col="green")
+
+rolls %>% 
+  ggplot( aes(x=sums)) + 
+    geom_histogram(binwidth = 0.5) + 
+    geom_histogram(data = focus_data, fill="violet", binwidth = 0.5) +
+    geom_vline(xintercept = sum1, col="blue") + 
+    geom_vline(xintercept =sum2, col="green") 
+
+```
+
+# Summarize data with frequency function
+
+```{r}
+
+sums %>% 
+  freq() 
+
+
+
+```
