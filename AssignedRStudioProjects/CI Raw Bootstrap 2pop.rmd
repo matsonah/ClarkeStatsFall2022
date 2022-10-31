@@ -1,0 +1,194 @@
+---
+title: "GPA Calculator"
+output: html_document
+---
+
+# Initialize
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages}
+
+#install.packages("tidyverse")
+library(tidyverse)
+
+```
+
+```{r special function}
+
+# Fancy function defined to allow for shading. 
+dnorm_sd <- function(x,numsd){
+  norm_sd <- dnorm(x,Boot_mean, Boot_sd)
+  lb = Boot_mean - numsd*Boot_sd  #left bound 
+  rb = Boot_mean + numsd*Boot_sd  #right bound 
+  # Force NA values outside interval x in [leftbound, rightbound]:
+  norm_sd[x <= lb | x >= rb] <- NA
+  return(norm_sd)   #return is the result of the function dnorm_sd 
+}
+
+
+```
+
+# Load Data
+
+## Load Quantitative Data
+
+```{r load data}
+
+gender <- 
+  read_csv(
+    url("https://gender-pay-gap.service.gov.uk/viewing/download-data/2019"), 
+    show_col_types =F)   #Try out different years
+
+names(gender)
+# Read about calculations: https://www.gov.uk/guidance/making-your-gender-pay-gap-calculations#overview 
+backup <- gender 
+
+```
+
+Choose two numerical columns and confidence level.
+
+```{r choose}
+
+data1 <-
+  gender$FemaleUpperMiddleQuartile 
+
+data1 <- 
+  data1 %>% 
+    subset(!is.na(.))
+
+data2 <- 
+  gender$MaleUpperMiddleQuartile
+
+data2 <- 
+  data2 %>% 
+    subset(!is.na(.))
+
+z_conf= 0.95 # Whatever confidence level you want.
+
+```
+
+## Load Qualitative Data
+
+```{r}
+sample_count1= 8
+sample_size1 = 50
+
+sample_count2= 15
+sample_size2 = 42
+
+
+
+z_conf=0.8
+
+
+sample_complement1 <- 
+  sample_size1-sample_count1 
+
+data1 <- 
+  rep(
+    c(1,0),
+    c(sample_count1,sample_complement1))   # repeats 1 sample_count times and 0 sample_complement times. 
+
+sample_complement2 <- 
+  sample_size2-sample_count2 
+
+data2 <- 
+  rep(
+    c(1,0),
+    c(sample_count2,sample_complement2))   # repeats 1 sample_count times and 0 sample_complement times. 
+```
+
+# Confidence Intervals
+
+## Not So Large Sample Size
+
+If you play this chunk of code and it tests your patience, then your sample size is large.
+
+Requires data1, data2, and z_conf.
+
+```{r bootstrap}
+
+
+alpha <- 
+  1-z_conf 
+zsc <- 
+  qnorm(z_conf + alpha/2)
+
+size1 <- 
+  data1 %>% 
+    length()
+
+size2 <- 
+  data2 %>% 
+    length()
+
+
+test <- 
+  0
+test_runs <- 
+  100000
+
+for(i in 1:test_runs){
+  test[i] = mean( sample(data1,size1,replace=TRUE)) - 
+            mean( sample(data2,size2,replace=TRUE))
+  }
+cat("Original sample statistic is an average of", mean(data1) - mean(data2),"units with a standard deviation of", sd(data), "units.\n")
+
+Boot <- 
+  data.frame(x=test)
+Boot_mean <- 
+  Boot$x %>% 
+    mean()
+Boot_sd <- 
+  Boot$x %>% 
+    sd()
+
+Boot_left <- 
+  Boot_mean - zsc*Boot_sd
+
+Boot_right <- 
+  Boot_mean + zsc*Boot_sd 
+
+Boots <- 
+  c(Boot_left,Boot_right)
+
+width <- 
+  (max(data)-min(data)) /
+    (10*length(data))
+
+Boot %>% 
+  ggplot(aes(x)) + 
+    geom_histogram(aes(y=..density..),binwidth=width) +   #change bindwidth to be nice.
+    stat_function( fun=dnorm,    args=list(mean=Boot_mean, sd=Boot_sd), col="green", size=2) +
+    stat_function( fun=dnorm_sd, args=list(numsd=zsc),  geom="area",  fill="green", alpha=0.3 ) + 
+    geom_vline( xintercept=Boots,  linetype="longdash",  col="blue", size=2) 
+
+cat(sep="", "With a confidence level of ", z_conf*100, "%, the actual population", 
+            " parameter is between ", Boot_left, " and ", Boot_right, ".\n")
+
+cat(sep="", "With a confidence level of ", z_conf*100, "%, the actual population", 
+            " parameter is approximately ", Boot_mean, " with a margin ", 
+            "of error of ", zsc*Boot_sd, ".\n")    
+
+```
+
+## Large Sample Size
+
+Requries data and z_conf already defined.
+
+```{r}
+
+ci = t.test(data1,data2, conf.level=z_conf)
+me = (ci$conf.int[2] - ci$conf.int[1])/2 
+
+cat(sep="", "With a confidence level of ", z_conf*100, "%, the actual population", 
+            " paramater is between ", ci$conf.int[1], " and ", ci$conf.int[2], ".\n")
+
+cat(sep="", "With a confidence level of ", z_conf*100, "%, the actual population", 
+            " paramater is approximately ", ci$estimate[1] - ci$estimate[2], " with a margin ", 
+            "of error of ", me, ".\n") 
+```
+
